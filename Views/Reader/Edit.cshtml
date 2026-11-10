@@ -1,0 +1,91 @@
+@model NationalLibraryApp.Models.Reader
+@{
+    Layout = "_Layout";
+    var institutions = (List<string>)ViewBag.Institutions;
+    var isCustomInstitution = !institutions.Contains(Model.Institution);
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-body">
+                <h3 class="fw-bold mb-4">✏️ Редактирование профиля</h3>
+
+                <form action="/Reader/Edit" method="post">
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">ФИО</label>
+                            <input type="text" name="FullName" class="form-control" value="@Model.FullName" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Дата рождения</label>
+                            <input type="date" name="DateOfBirth" class="form-control" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Пол</label>
+                            <select name="Gender" class="form-select" required>
+                                <option value="Male" selected="@(Model.Gender == Gender.Male)">Мужской</option>
+                                <option value="Female" selected="@(Model.Gender == Gender.Female)">Женский</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Тип места</label>
+                            <select name="InstitutionType" class="form-select" required>
+                                <option value="Study" selected="@(Model.InstitutionType == InstitutionType.Study)">Учёба</option>
+                                <option value="Work" selected="@(Model.InstitutionType == InstitutionType.Work)">Работа</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Место учёбы/работы</label>
+                            <select name="Institution" id="institutionSelect" class="form-select" required>
+                                <option value="">Выберите из списка...</option>
+                                @foreach (var institution in institutions)
+                                {
+                                    <option value="@institution" selected="@(institution == Model.Institution)">@institution</option>
+                                }
+                                <option value="custom" selected="@isCustomInstitution">Другое (ввести своё)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Своё место учёбы/работы</label>
+                            <input type="text" name="customInstitution" id="customInstitution" class="form-control" value="@(isCustomInstitution ? Model.Institution : "")" placeholder="Введите название" disabled="@(!isCustomInstitution)" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ИИН</label>
+                            <input type="text" name="IIN" class="form-control" maxlength="12" pattern="\d{12}" value="@Model.IIN" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Почта</label>
+                            <input type="email" name="Email" class="form-control" value="@Model.Email" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Номер телефона</label>
+                            <input type="tel" name="Phone" class="form-control" value="@Model.Phone" required />
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">Сохранить</button>
+                        <a href="/Reader/Profile/@Model.Id" class="btn btn-outline-secondary px-4 py-2 fw-semibold">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const institutionSelect = document.getElementById('institutionSelect');
+    const customInstitution = document.getElementById('customInstitution');
+
+    institutionSelect.addEventListener('change', () => {
+        const isCustom = institutionSelect.value === 'custom';
+        customInstitution.disabled = !isCustom;
+        customInstitution.required = isCustom;
+        if (isCustom) {
+            customInstitution.focus();
+        } else {
+            customInstitution.value = '';
+        }
+    });
+</script>
